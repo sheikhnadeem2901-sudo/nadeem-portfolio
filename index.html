@@ -189,12 +189,13 @@
   /* Hero visual: real portrait cutout + floating stat cards, echoing the reference layout */
   .hero-visual {
     position: relative;
-    display: flex; align-items: center; justify-content: center; gap: 18px;
+    display: flex; align-items: flex-start; justify-content: center; gap: 14px;
+    width: 100%;
   }
   .hero-portrait-frame {
     position: relative;
-    width: min(62%, 340px);
-    flex-shrink: 0;
+    width: 240px;
+    flex: 0 0 auto;
   }
   .hero-portrait-frame img {
     width: 100%; height: auto; display: block;
@@ -203,21 +204,24 @@
   }
   .hero-stat-cards {
     display: flex; flex-direction: column; gap: 10px;
-    align-self: flex-start;
+    flex: 0 0 auto;
+    width: 150px;
     margin-top: 6%;
   }
   @media (max-width: 640px) {
-    .hero-visual { flex-direction: column; }
+    .hero-visual { flex-direction: column; align-items: center; }
     .hero-portrait-frame { width: min(72%, 320px); }
-    .hero-stat-cards { flex-direction: row; flex-wrap: wrap; align-self: stretch; justify-content: center; margin-top: 18px; }
+    .hero-stat-cards { flex-direction: row; flex-wrap: wrap; width: 100%; justify-content: center; margin-top: 18px; }
   }
   .hero-stat-card {
     background: color-mix(in srgb, var(--bg) 72%, transparent);
     border: 1px solid rgba(201,164,76,0.35);
     backdrop-filter: blur(8px);
-    padding: 12px 18px;
-    min-width: 128px;
+    padding: 12px 16px;
+    width: 100%;
+    box-sizing: border-box;
   }
+  @media (max-width: 640px) { .hero-stat-card { width: auto; min-width: 128px; } }
   .hero-stat-card strong {
     display: block; font-family: var(--serif); font-size: 1.3rem; color: var(--gold-bright);
     font-variant-numeric: tabular-nums;
