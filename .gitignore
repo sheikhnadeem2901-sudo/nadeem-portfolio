@@ -1,0 +1,10 @@
+# Apps Script project (separate concern, not part of the website)
+src/
+.clasp.json
+watch-and-push.ps1
+
+# Scratch / intermediate image files
+images/*.b64.txt
+images/hero-composite-test.png
+images/nadeem-hero-cutout.png
+images/*-opt.jpg
