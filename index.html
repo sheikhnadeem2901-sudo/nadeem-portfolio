@@ -227,6 +227,22 @@
   .hero-eyebrow .line { width: 32px; height: 1px; background: var(--gold); }
   .hero .eyebrow { color: var(--gold-bright); }
 
+  .hero-mobile-cta { display: none; }
+  @media (max-width: 1024px) {
+    .hero-mobile-cta {
+      display: flex; justify-content: center; gap: 10px;
+      margin: 4px 0 26px;
+    }
+    .hero-mobile-cta .btn { flex: 0 1 auto; white-space: nowrap; }
+  }
+  @media (max-width: 400px) {
+    .hero-mobile-cta { gap: 8px; }
+    .hero-mobile-cta .btn { padding: 10px 14px; font-size: 0.68rem; }
+  }
+  @media (max-width: 340px) {
+    .hero-mobile-cta .btn { padding: 9px 10px; font-size: 0.62rem; letter-spacing: 0.03em; }
+  }
+
   .hero h1 {
     font-size: clamp(2.5rem, 5.5vw, 4.1rem);
     line-height: 1.05;
@@ -674,6 +690,15 @@
   }
   .sv-node.is-active .sv-node-title { color: var(--gold); }
 
+  .sv-mobile-hint { display: none; }
+  @media (max-width: 1024px) {
+    .sv-mobile-hint {
+      display: block; text-align: center;
+      font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--gold); margin: 18px 0 0;
+    }
+  }
+
   /* Inline detail area */
   .sv-detail-inline { margin-top: 44px; padding-top: 44px; border-top: 1px solid var(--border); perspective: 1400px; }
   .sv-detail-grid {
@@ -829,6 +854,15 @@
   .pr-node-desc { display: none; }
   @media (min-width: 900px) {
     .pr-node-desc { display: block; font-size: 0.78rem; color: var(--ink-faint); line-height: 1.5; margin-top: 6px; }
+  }
+
+  .pr-mobile-hint { display: none; }
+  @media (max-width: 1024px) {
+    .pr-mobile-hint {
+      display: block; text-align: center;
+      font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--gold); margin: 18px 0 0;
+    }
   }
 
   /* Inline detail area: part of the section, not a popup */
@@ -2189,6 +2223,10 @@
 
   <div class="wrap hero-grid">
     <div>
+      <div class="hero-mobile-cta">
+        <a class="btn btn-outline btn-sm" href="https://wa.me/97471924756" target="_blank" rel="noopener">Get In Touch</a>
+        <a class="btn btn-gold btn-sm" href="#contact">Hire Me</a>
+      </div>
       <div class="hero-eyebrow"><span class="line"></span><span class="eyebrow">Design-to-Build Specialist</span></div>
       <h1 class="hero-headline">
         <span class="line-reveal" style="--d:0"><span>Designing spaces.</span></span><br>
@@ -2441,6 +2479,8 @@
       </button>
     </div>
 
+    <p class="sv-mobile-hint">Select a discipline to view details</p>
+
     <div class="sv-detail-inline" id="svDetailInline">
       <div class="sv-detail-grid" id="svDetailGrid">
         <div class="sv-detail-copy">
@@ -2614,6 +2654,8 @@
         <span class="pr-node-desc">Quality checks and final client delivery.</span>
       </button>
     </div>
+
+    <p class="pr-mobile-hint">Select a stage to view details</p>
 
     <div class="pr-detail-inline" id="prDetailInline">
       <div class="pr-detail-grid" id="prDetailGrid">
@@ -3379,8 +3421,25 @@ function fetchFeaturedProjectFolders(parentFolderId) {
   elNavPrev.addEventListener('click', prevImage);
   elNavNext.addEventListener('click', nextImage);
 
-  visual.addEventListener('mouseenter', function () { isHovering = true; });
-  visual.addEventListener('mouseleave', function () { isHovering = false; });
+  var isTouchDevice = window.matchMedia('(hover: none)').matches;
+  var touchResumeTimer = null;
+
+  if (isTouchDevice) {
+    /* Mobile: only a deliberate touch on the carousel pauses it. Merely
+       scrolling the section into view, or it being visible on screen,
+       must never pause autoplay — only real touch interaction does. */
+    visual.addEventListener('touchstart', function () {
+      if (touchResumeTimer) clearTimeout(touchResumeTimer);
+      isHovering = true;
+    }, { passive: true });
+    visual.addEventListener('touchend', function () {
+      if (touchResumeTimer) clearTimeout(touchResumeTimer);
+      touchResumeTimer = setTimeout(function () { isHovering = false; }, 1200);
+    }, { passive: true });
+  } else {
+    visual.addEventListener('mouseenter', function () { isHovering = true; });
+    visual.addEventListener('mouseleave', function () { isHovering = false; });
+  }
 
   function openModal(index) {
     var project = PROJECTS[index];
@@ -4802,7 +4861,15 @@ function fetchFeaturedProjectFolders(parentFolderId) {
   // identically for mobile touch, since touch fires click without hover).
   nodes.forEach(function (node) {
     var idx = parseInt(node.dataset.step, 10);
-    node.addEventListener('click', function () { setActiveStage(idx, {}); });
+    node.addEventListener('click', function () {
+      setActiveStage(idx, {});
+      if (window.matchMedia('(max-width: 1024px)').matches) {
+        var detailEl = document.getElementById('prDetailInline');
+        if (detailEl) {
+          detailEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        }
+      }
+    });
     if (!reduceMotion) {
       node.addEventListener('mouseenter', function () { setActiveStage(idx, {}); });
     }
@@ -4997,7 +5064,15 @@ function fetchFeaturedProjectFolders(parentFolderId) {
 
   nodes.forEach(function (node) {
     var idx = parseInt(node.dataset.step, 10);
-    node.addEventListener('click', function () { setActiveStage(idx, {}); });
+    node.addEventListener('click', function () {
+      setActiveStage(idx, {});
+      if (window.matchMedia('(max-width: 1024px)').matches) {
+        var detailEl = document.getElementById('svDetailInline');
+        if (detailEl) {
+          detailEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        }
+      }
+    });
     if (!reduceMotion) {
       node.addEventListener('mouseenter', function () { setActiveStage(idx, {}); });
     }
