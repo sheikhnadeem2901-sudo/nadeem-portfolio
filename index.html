@@ -115,6 +115,94 @@
   .nav-links { display: none; }
   @media (min-width: 860px) { .nav-links { display: flex; } }
 
+  /* ===== Mobile sidebar navigation (<=1024px only) ===== */
+  .nav-burger {
+    display: none;
+    flex-direction: column; justify-content: center; gap: 5px;
+    width: 40px; height: 40px;
+    background: none; border: 1px solid var(--border);
+    cursor: pointer; flex-shrink: 0;
+  }
+  .nav-burger span {
+    display: block; width: 18px; height: 1px; margin: 0 auto;
+    background: var(--gold); transition: transform 0.25s ease, opacity 0.2s ease;
+  }
+  .nav-burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .nav-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .nav-burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  @media (max-width: 1024px) {
+    .nav-burger { display: flex; }
+    .nav .wrap { position: relative; justify-content: center; }
+    .nav-brand { position: relative; }
+    .nav-cta-group { display: none; }
+    .nav-burger { position: absolute; left: 0; }
+  }
+
+  .msb-backdrop {
+    display: none;
+    position: fixed; inset: 0; z-index: 490;
+    background: rgba(6,6,7,0.72);
+    backdrop-filter: blur(3px);
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .msb-backdrop.is-open { display: block; }
+  .msb-backdrop.is-visible { opacity: 1; }
+
+  .msb {
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 500;
+    width: min(300px, 84vw);
+    background: #0b0b0d;
+    border-right: 1px solid var(--border);
+    box-shadow: 30px 0 60px rgba(0,0,0,0.4);
+    display: flex; flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    overflow-y: auto;
+  }
+  .msb.is-open { transform: translateX(0); }
+  .msb.is-dragging { transition: none; }
+
+  .msb-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 22px 20px; border-bottom: 1px solid var(--border);
+  }
+  .msb-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .msb-mark { width: 44px; height: 44px; }
+  .msb-close {
+    width: 36px; height: 36px; flex-shrink: 0;
+    background: none; border: 1px solid var(--border); color: var(--ink);
+    font-size: 1.2rem; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .msb-close:hover { border-color: var(--gold); color: var(--gold); }
+
+  .msb-links { list-style: none; margin: 0; padding: 14px 8px; flex: 1; }
+  .msb-links a {
+    display: block; padding: 13px 16px; font-size: 0.95rem;
+    color: var(--ink-dim); text-decoration: none;
+    transition: color 0.2s, background 0.2s;
+  }
+  .msb-links a:hover, .msb-links a:focus-visible { color: var(--gold); background: rgba(201,164,76,0.06); }
+
+  .msb-foot { padding: 20px; border-top: 1px solid var(--border); display: grid; gap: 14px; }
+  .msb-foot p { margin: 0; font-size: 0.82rem; color: var(--ink-faint); }
+  .msb-foot .btn { width: 100%; }
+  .msb-social { display: flex; gap: 10px; }
+  .msb-social a {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border); color: var(--ink-dim); text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .msb-social a:hover { border-color: var(--gold); color: var(--gold); }
+  .msb-copy { font-size: 0.72rem; color: var(--ink-faint); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .msb, .msb-backdrop, .nav-burger span { transition: none; }
+  }
+
   /* ===== Hero ===== */
   .hero {
     position: relative;
@@ -1870,8 +1958,205 @@
       <a class="btn btn-outline btn-sm nav-cta" href="https://wa.me/97471924756" target="_blank" rel="noopener">Get In Touch</a>
       <a class="btn btn-gold btn-sm nav-cta" href="#contact">Hire Me</a>
     </div>
+    <button class="nav-burger" id="navBurger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileSidebar">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+
+<div class="msb-backdrop" id="msbBackdrop"></div>
+<aside class="msb" id="mobileSidebar" aria-hidden="true">
+  <div class="msb-head">
+    <a class="msb-brand" href="#top">
+      <span class="nav-mark msb-mark" id="msbMarkSlot"></span>
+      <span class="nav-name">
+        <strong>Mohammad Nadeem Sheikh</strong>
+        <span>Design-to-Build Portfolio</span>
+      </span>
+    </a>
+    <button class="msb-close" id="msbClose" type="button" aria-label="Close menu">&times;</button>
+  </div>
+  <ul class="msb-links">
+    <li><a href="#top">Home</a></li>
+    <li><a href="#about">About Me</a></li>
+    <li><a href="#services">Expertise</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Selected Work</a></li>
+    <li><a href="#stats">Proven Impact</a></li>
+    <li><a href="#contact">Let's Work Together</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="msb-foot">
+    <p>Let's discuss your project</p>
+    <a class="btn btn-gold" href="#contact">Get In Touch</a>
+    <div class="msb-social">
+      <a href="https://wa.me/97471924756" target="_blank" rel="noopener" aria-label="WhatsApp">☎</a>
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=sheikh.nadeem2901@gmail.com" target="_blank" rel="noopener" aria-label="Email">✉</a>
+    </div>
+    <span class="msb-copy">&copy; 2026 Mohammad Nadeem Sheikh. All rights reserved.</span>
+  </div>
+</aside>
+
+<script>
+(function () {
+  var burger = document.getElementById('navBurger');
+  var sidebar = document.getElementById('mobileSidebar');
+  var backdrop = document.getElementById('msbBackdrop');
+  var closeBtn = document.getElementById('msbClose');
+  var markSlot = document.getElementById('msbMarkSlot');
+  if (!burger || !sidebar || !backdrop || !closeBtn) return;
+
+  var sourceMark = document.querySelector('.nav-brand .nav-mark img');
+  if (sourceMark && markSlot) {
+    var clone = sourceMark.cloneNode(true);
+    markSlot.appendChild(clone);
+  }
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var isOpen = false;
+  var lastFocused = null;
+
+  function focusableEls() {
+    return Array.prototype.slice.call(
+      sidebar.querySelectorAll('a[href], button:not([disabled])')
+    );
+  }
+
+  function openSidebar() {
+    if (isOpen) return;
+    isOpen = true;
+    lastFocused = document.activeElement;
+    backdrop.classList.add('is-open');
+    requestAnimationFrame(function () { backdrop.classList.add('is-visible'); });
+    sidebar.classList.add('is-open');
+    sidebar.setAttribute('aria-hidden', 'false');
+    burger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    var els = focusableEls();
+    if (els.length) els[0].focus();
+  }
+
+  function closeSidebar() {
+    if (!isOpen) return;
+    isOpen = false;
+    sidebar.classList.remove('is-open');
+    sidebar.setAttribute('aria-hidden', 'true');
+    burger.setAttribute('aria-expanded', 'false');
+    backdrop.classList.remove('is-visible');
+    document.body.style.overflow = '';
+    setTimeout(function () { backdrop.classList.remove('is-open'); }, reduceMotion ? 0 : 300);
+    if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+  }
+
+  burger.addEventListener('click', function () {
+    if (isOpen) closeSidebar(); else openSidebar();
+  });
+  closeBtn.addEventListener('click', closeSidebar);
+  backdrop.addEventListener('click', closeSidebar);
+
+  sidebar.querySelectorAll('.msb-links a, .msb-foot .btn').forEach(function (link) {
+    link.addEventListener('click', function () {
+      closeSidebar();
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (!isOpen) return;
+    if (e.key === 'Escape') {
+      closeSidebar();
+      return;
+    }
+    if (e.key === 'Tab') {
+      var els = focusableEls();
+      if (!els.length) return;
+      var first = els[0];
+      var last = els[els.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  });
+
+  /* Swipe gestures: open on a rightward swipe starting near the left
+     edge, close on a leftward swipe while open. Only tracked below the
+     1024px breakpoint, and the horizontal-vs-vertical check keeps normal
+     page scrolling from being hijacked. */
+  var EDGE_ZONE = 24;
+  var OPEN_THRESHOLD = 60;
+  var touchStartX = 0;
+  var touchStartY = 0;
+  var tracking = false;
+  var draggingOpen = false;
+
+  function isMobileWidth() {
+    return window.matchMedia('(max-width: 1024px)').matches;
+  }
+
+  document.addEventListener('touchstart', function (e) {
+    if (!isMobileWidth()) return;
+    var t = e.touches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    if (!isOpen && touchStartX <= EDGE_ZONE) {
+      tracking = true;
+      draggingOpen = true;
+    } else if (isOpen) {
+      tracking = true;
+      draggingOpen = false;
+    } else {
+      tracking = false;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function (e) {
+    if (!tracking) return;
+    var t = e.touches[0];
+    var dx = t.clientX - touchStartX;
+    var dy = t.clientY - touchStartY;
+    if (Math.abs(dy) > Math.abs(dx)) return;
+
+    if (draggingOpen && dx > 0) {
+      sidebar.classList.add('is-dragging', 'is-open');
+      sidebar.setAttribute('aria-hidden', 'false');
+      backdrop.classList.add('is-open', 'is-visible');
+      var progress = Math.max(0, Math.min(1, dx / 300));
+      sidebar.style.transform = 'translateX(' + (-100 + progress * 100) + '%)';
+    } else if (!draggingOpen && isOpen && dx < 0) {
+      sidebar.classList.add('is-dragging');
+      var closeProgress = Math.max(0, Math.min(1, -dx / 300));
+      sidebar.style.transform = 'translateX(' + (-closeProgress * 100) + '%)';
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', function (e) {
+    if (!tracking) return;
+    tracking = false;
+    sidebar.classList.remove('is-dragging');
+    sidebar.style.transform = '';
+
+    var t = e.changedTouches[0];
+    var dx = t.clientX - touchStartX;
+
+    if (draggingOpen) {
+      if (dx > OPEN_THRESHOLD) {
+        openSidebar();
+      } else {
+        sidebar.classList.remove('is-open');
+        sidebar.setAttribute('aria-hidden', 'true');
+        backdrop.classList.remove('is-visible', 'is-open');
+      }
+    } else if (isOpen && dx < -OPEN_THRESHOLD) {
+      closeSidebar();
+    }
+  }, { passive: true });
+})();
+</script>
 
 <header class="hero" id="top">
   <svg class="hero-blueprint" viewBox="0 0 1180 700" preserveAspectRatio="none" aria-hidden="true">
