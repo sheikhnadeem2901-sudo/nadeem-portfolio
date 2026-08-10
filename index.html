@@ -1800,6 +1800,22 @@
   .cta-contact-row a { text-decoration: none; user-select: text; cursor: pointer; }
   .cta-contact-row a:hover { color: var(--gold); }
 
+  .contact-form { margin-top: 32px; display: grid; gap: 18px; }
+  .contact-form-row { display: grid; gap: 8px; }
+  .contact-form-label { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); }
+  .contact-form-input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--ink);
+    padding: 12px 14px; font-size: 0.92rem; font-family: inherit;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .contact-form-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 1px rgba(201,164,76,0.35); }
+  .contact-form-textarea { resize: vertical; min-height: 100px; }
+  .contact-form-honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .contact-form-status { font-size: 0.85rem; min-height: 1.2em; margin: 0; }
+  .contact-form-status.is-success { color: var(--gold); }
+  .contact-form-status.is-error { color: #d97d6a; }
+  #cfSubmit[disabled] { opacity: 0.6; cursor: not-allowed; }
+
   /* ===== Footer ===== */
   footer { padding: 56px 0 40px; }
   .foot-grid { display: grid; grid-template-columns: 1fr; gap: 36px; margin-bottom: 40px; }
@@ -1852,7 +1868,7 @@
     </ul>
     <div class="nav-cta-group">
       <a class="btn btn-outline btn-sm nav-cta" href="https://wa.me/97471924756" target="_blank" rel="noopener">Get In Touch</a>
-      <a class="btn btn-gold btn-sm nav-cta" href="https://mail.google.com/mail/?view=cm&fs=1&to=sheikh.nadeem2901@gmail.com&su=Let%27s%20work%20together" target="_blank" rel="noopener">Hire Me</a>
+      <a class="btn btn-gold btn-sm nav-cta" href="#contact">Hire Me</a>
     </div>
   </div>
 </nav>
@@ -2443,6 +2459,72 @@ function fetchFolderVideos(sectionName) {
     .then(function (r) { return r.json(); })
     .catch(function () { return { videos: [] }; });
 }
+
+function submitContactMessage(payload) {
+  var DRIVE_API_BASE = 'https://script.google.com/macros/s/AKfycbzOrDrQjhNIAoJegrhZV5UJJhNlMB_ypfMc4DlAaeSUZAxTeASHI9e8PZcPPLhvvjaA5Q/exec';
+  if (typeof google !== 'undefined' && google.script && google.script.run) {
+    return new Promise(function (resolve) {
+      google.script.run
+        .withSuccessHandler(function (data) { resolve(data || { ok: false, error: 'No response from server.' }); })
+        .withFailureHandler(function () { resolve({ ok: false, error: 'Something went wrong. Please try again.' }); })
+        .sendContactMessage(payload);
+    });
+  }
+  return fetch(DRIVE_API_BASE, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+    .then(function (r) { return r.json(); })
+    .catch(function () { return { ok: false, error: 'Something went wrong. Please try again.' }; });
+}
+
+(function () {
+  var form = document.getElementById('contactForm');
+  if (form) {
+    var elName = document.getElementById('cfName');
+    var elEmail = document.getElementById('cfEmail');
+    var elMessage = document.getElementById('cfMessage');
+    var elHoneypot = document.getElementById('cfHoneypot');
+    var elSubmit = document.getElementById('cfSubmit');
+    var elStatus = document.getElementById('cfStatus');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      elStatus.textContent = '';
+      elStatus.className = 'contact-form-status';
+
+      var payload = {
+        name: elName.value,
+        email: elEmail.value,
+        message: elMessage.value,
+        honeypot: elHoneypot.value,
+      };
+
+      if (!payload.name.trim() || !payload.email.trim() || !payload.message.trim()) {
+        elStatus.textContent = 'Please fill in your name, email, and message.';
+        elStatus.className = 'contact-form-status is-error';
+        return;
+      }
+
+      elSubmit.disabled = true;
+      elSubmit.textContent = 'Sending…';
+
+      submitContactMessage(payload).then(function (result) {
+        elSubmit.disabled = false;
+        if (result && result.ok) {
+          elSubmit.textContent = 'Send Message';
+          elStatus.textContent = 'Thank you — your message has been sent.';
+          elStatus.className = 'contact-form-status is-success';
+          form.reset();
+        } else {
+          elSubmit.textContent = 'Send Message';
+          elStatus.textContent = (result && result.error) || 'Something went wrong. Please try again.';
+          elStatus.className = 'contact-form-status is-error';
+        }
+      });
+    });
+  }
+})();
 
 (function () {
   var SECTIONS = [
@@ -3501,9 +3583,25 @@ function fetchFeaturedProjectFolders(parentFolderId) {
         <span class="eyebrow">Let's Build Something Great</span>
         <h2 style="margin-top:14px;">Have a project in mind?</h2>
         <p>Let's discuss your ideas and turn them into buildable, beautiful, functional spaces, from concept drawing to final handover.</p>
-        <div class="hero-actions" style="margin-top:32px;">
-          <a class="btn btn-gold" href="https://mail.google.com/mail/?view=cm&fs=1&to=sheikh.nadeem2901@gmail.com&su=Let%27s%20work%20together" target="_blank" rel="noopener">Get In Touch</a>
-        </div>
+        <form class="contact-form" id="contactForm" novalidate>
+          <div class="contact-form-row">
+            <label class="contact-form-label" for="cfName">Name</label>
+            <input class="contact-form-input" type="text" id="cfName" name="name" autocomplete="name" required />
+          </div>
+          <div class="contact-form-row">
+            <label class="contact-form-label" for="cfEmail">Email</label>
+            <input class="contact-form-input" type="email" id="cfEmail" name="email" autocomplete="email" required />
+          </div>
+          <div class="contact-form-row">
+            <label class="contact-form-label" for="cfMessage">Message</label>
+            <textarea class="contact-form-input contact-form-textarea" id="cfMessage" name="message" rows="4" required></textarea>
+          </div>
+          <input class="contact-form-honeypot" type="text" id="cfHoneypot" name="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <div class="hero-actions" style="margin-top:8px;">
+            <button class="btn btn-gold" type="submit" id="cfSubmit">Send Message</button>
+          </div>
+          <p class="contact-form-status" id="cfStatus" role="status"></p>
+        </form>
       </div>
       <div class="cta-contacts">
         <div class="cta-contact-row"><span class="ico">☎</span><a href="tel:+97471924756">+974-7192 4756</a></div>
