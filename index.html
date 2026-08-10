@@ -1935,10 +1935,10 @@
     .cta-contact-row-email { position: relative; }
     .cta-email-pointer {
       display: flex; align-items: center; justify-content: center;
-      width: 22px; height: 22px; flex-shrink: 0;
+      width: 28px; height: 28px; flex-shrink: 0;
       animation: ctaPointerNudge 2.4s ease-in-out infinite;
     }
-    .cta-email-pointer svg { width: 100%; height: 100%; }
+    .cta-email-pointer svg { width: 100%; height: 100%; transform: rotate(90deg); transform-origin: center; }
   }
   @keyframes ctaPointerNudge {
     0%, 18% { transform: translateX(0); opacity: 0.75; }
@@ -3986,9 +3986,17 @@ function fetchFeaturedProjectFolders(parentFolderId) {
         <div class="cta-contact-row cta-contact-row-email">
           <span class="ico">✉</span>
           <span class="cta-email-pointer" aria-hidden="true">
-            <svg viewBox="0 0 40 24" fill="none">
-              <path d="M4 12 L26 12" stroke="var(--gold)" stroke-width="2.2" stroke-linecap="round"/>
-              <path d="M19 5 L27 12 L19 19" stroke="var(--gold)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <svg viewBox="0 0 30 38" fill="none" class="cta-hand-svg">
+              <path d="M2 20 C2 18.3 3.3 17 5 17 C6.7 17 8 18.3 8 20 L8 22"
+                stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <path d="M8 22 L8 12 C8 10.3 9.3 9 11 9 C12.7 9 14 10.3 14 12 L14 20"
+                stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="var(--gold)" fill-opacity="0.08"/>
+              <path d="M14 20 L14 8 C14 6.3 15.3 5 17 5 C18.7 5 20 6.3 20 8 L20 20"
+                stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="var(--gold)" fill-opacity="0.08"/>
+              <path d="M20 20 L20 10 C20 8.3 21.3 7 23 7 C24.7 7 26 8.3 26 10 L26 24"
+                stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="var(--gold)" fill-opacity="0.08"/>
+              <path d="M2 20 L2 25 C2 30.5 6.5 35 12 35 L18 35 C23 35 27 31 27 26 L27 22"
+                stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="var(--gold)" fill-opacity="0.12"/>
             </svg>
           </span>
           <a href="https://mail.google.com/mail/?view=cm&fs=1&to=sheikh.nadeem2901@gmail.com" target="_blank" rel="noopener">sheikh.nadeem2901@gmail.com</a>
